@@ -1,0 +1,9 @@
+version: "3.9"
+services:
+  ks-doc:
+    build:
+      context: .
+    container_name: ks-doc
+    ports:
+      - "3000:3000"
+    restart: unless-stopped 
