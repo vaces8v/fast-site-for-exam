@@ -8,6 +8,7 @@ import bash from "react-syntax-highlighter/dist/esm/languages/prism/bash";
 import python from "react-syntax-highlighter/dist/esm/languages/prism/python";
 import tsx from "react-syntax-highlighter/dist/esm/languages/prism/tsx";
 import sql from "react-syntax-highlighter/dist/esm/languages/prism/sql";
+import json from "react-syntax-highlighter/dist/esm/languages/prism/json";
 
 SyntaxHighlighter.registerLanguage("bash", bash);
 SyntaxHighlighter.registerLanguage("shell", bash);
@@ -15,6 +16,7 @@ SyntaxHighlighter.registerLanguage("python", python);
 SyntaxHighlighter.registerLanguage("tsx", tsx);
 SyntaxHighlighter.registerLanguage("typescript", tsx);
 SyntaxHighlighter.registerLanguage("sql", sql);
+SyntaxHighlighter.registerLanguage("json", json);
 
 interface CodeBlockProps {
   code: string;

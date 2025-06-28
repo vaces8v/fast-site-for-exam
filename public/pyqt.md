@@ -2,80 +2,538 @@
 
 PyQt - это набор привязок Python для кроссплатформенного фреймворка для разработки приложений Qt.
 
-## Установка
+## 1. Установка и настройка
 
-Для установки PyQt вы можете использовать pip:
+### 1.1 Создание виртуального окружения
+
+Рекомендуется использовать виртуальное окружение для изоляции зависимостей проекта:
 
 ```bash
-pip install PyQt6
+# Создание виртуального окружения
+python -m venv pyqt_venv
+
+# Активация в Windows
+pyqt_venv\Scripts\activate
+
+# Активация в Linux/Mac
+source pyqt_venv/bin/activate
 ```
 
-## Основные виджеты
+### 1.2 Установка PyQt
 
-Qt предоставляет множество виджетов.
+После активации виртуального окружения установите PyQt:
 
-### Окно
+```bash
+# Установка PyQt6
+pip install PyQt6
 
-Основное окно приложения.
+# Для работы с базами данных
+pip install PyMySQL
+
+# Сохранение зависимостей в файл
+pip freeze > requirements.txt
+```
+
+### 1.3 Проверка установки
+
+Создайте тестовый файл `test_pyqt.py`:
 
 ```python
 import sys
-from PyQt6.QtWidgets import QApplication, QWidget
+from PyQt6.QtWidgets import QApplication, QLabel
 
 app = QApplication(sys.argv)
-window = QWidget()
+label = QLabel("PyQt6 успешно установлен!")
+label.show()
+sys.exit(app.exec())
+```
+
+Запустите его:
+
+```bash
+python test_pyqt.py
+```
+
+## 2. Основы интерфейса
+
+### 2.1 Структура базового приложения
+
+Минимальная структура для любого PyQt-приложения:
+
+```python
+import sys
+from PyQt6.QtWidgets import QApplication, QMainWindow
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        
+        # Заголовок окна
+        self.setWindowTitle("Моё приложение")
+        
+        # Размер окна
+        self.setGeometry(100, 100, 400, 300)  # x, y, width, height
+        
+        # Здесь добавляем виджеты и настраиваем UI
+
+# Запуск приложения
+app = QApplication(sys.argv)
+window = MainWindow()
 window.show()
 sys.exit(app.exec())
 ```
 
-### Кнопка
+### 2.2 Основные макеты (layouts)
 
-Стандартная кнопка, на которую можно нажать.
+PyQt предлагает несколько типов макетов для организации виджетов:
+
+#### Вертикальный макет (QVBoxLayout)
 
 ```python
 import sys
-from PyQt6.QtWidgets import QApplication, QPushButton
+from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Вертикальный макет")
+        
+        # Создаем центральный виджет
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        
+        # Создаем вертикальный макет
+        layout = QVBoxLayout(central_widget)
+        
+        # Добавляем кнопки
+        for i in range(1, 4):
+            button = QPushButton(f"Кнопка {i}")
+            layout.addWidget(button)
 
 app = QApplication(sys.argv)
-btn = QPushButton("Нажми меня!")
-btn.clicked.connect(lambda: print("Клик!"))
-btn.resize(120, 40)  # необязательно, просто для наглядности
-btn.show()
+window = MainWindow()
+window.show()
 sys.exit(app.exec())
 ```
 
-### Ещё 4 базовых виджета за 60 секунд
+#### Горизонтальный макет (QHBoxLayout)
+
+```python
+# Замените QVBoxLayout на QHBoxLayout для горизонтального расположения
+from PyQt6.QtWidgets import QHBoxLayout
+
+layout = QHBoxLayout(central_widget)
+```
+
+#### Сеточный макет (QGridLayout)
+
+```python
+import sys
+from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QGridLayout, QPushButton
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Сеточный макет")
+        
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        
+        # Создаем сеточный макет
+        layout = QGridLayout(central_widget)
+        
+        # Добавляем кнопки в виде сетки
+        names = [
+            '1', '2', '3',
+            '4', '5', '6',
+            '7', '8', '9',
+            '*', '0', '#'
+        ]
+        
+        positions = [(i, j) for i in range(4) for j in range(3)]
+        
+        for position, name in zip(positions, names):
+            button = QPushButton(name)
+            layout.addWidget(button, *position)
+
+app = QApplication(sys.argv)
+window = MainWindow()
+window.show()
+sys.exit(app.exec())
+```
+
+#### Форменный макет (QFormLayout)
+
+```python
+import sys
+from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QFormLayout, QLineEdit, QLabel
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Форменный макет")
+        
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        
+        # Создаем форменный макет (пары ярлык-поле)
+        layout = QFormLayout(central_widget)
+        
+        # Добавляем поля формы
+        layout.addRow("Имя:", QLineEdit())
+        layout.addRow("Email:", QLineEdit())
+        layout.addRow("Возраст:", QLineEdit())
+
+app = QApplication(sys.argv)
+window = MainWindow()
+window.show()
+sys.exit(app.exec())
+```
+
+### 2.3 Шпаргалка по макетам
+
+| Макет | Использование | Когда применять |
+|-------|--------------|----------------|
+| QVBoxLayout | Элементы в столбик сверху вниз | Для списков, меню, форм |
+| QHBoxLayout | Элементы в строчку слева направо | Для панелей инструментов, кнопок действий |
+| QGridLayout | Элементы в виде таблицы | Для калькуляторов, сложных форм |
+| QFormLayout | Пары ярлык-поле | Для форм ввода данных |
+
+## 3. Интерактивные элементы
+
+### 3.1 Кнопки и действия
+
+```python
+import sys
+from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QWidget, QLabel
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Обработка событий")
+        
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        
+        layout = QVBoxLayout(central_widget)
+        
+        # Создаем метку для вывода результата
+        self.result_label = QLabel("Нажмите кнопку")
+        layout.addWidget(self.result_label)
+        
+        # Создаем кнопку с подключением к обработчику
+        button = QPushButton("Нажми меня")
+        button.clicked.connect(self.on_button_click)
+        layout.addWidget(button)
+        
+        # Счетчик нажатий
+        self.counter = 0
+    
+    def on_button_click(self):
+        self.counter += 1
+        self.result_label.setText(f"Кнопка нажата {self.counter} раз")
+
+app = QApplication(sys.argv)
+window = MainWindow()
+window.show()
+sys.exit(app.exec())
+```
+
+### 3.2 Поля ввода и списки
 
 ```python
 import sys
 from PyQt6.QtWidgets import (
-    QApplication, QWidget, QLabel, QLineEdit,
-    QListWidget, QVBoxLayout, QPushButton
+    QApplication, QMainWindow, QWidget, QVBoxLayout,
+    QLabel, QLineEdit, QListWidget, QPushButton
 )
 
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Работа со списками")
+        
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        
+        layout = QVBoxLayout(central_widget)
+        
+        # Поле ввода с меткой
+        layout.addWidget(QLabel("Введите язык:"))
+        self.input_field = QLineEdit()
+        layout.addWidget(self.input_field)
+        
+        # Кнопка добавления
+        add_button = QPushButton("Добавить в список")
+        add_button.clicked.connect(self.add_to_list)
+        layout.addWidget(add_button)
+        
+        # Список с предустановленными элементами
+        layout.addWidget(QLabel("Любимые языки:"))
+        self.list_widget = QListWidget()
+        self.list_widget.addItems(["Python", "C++", "JavaScript"])
+        layout.addWidget(self.list_widget)
+        
+        # Кнопка для отображения выбранного элемента
+        show_button = QPushButton("Показать выбранный")
+        show_button.clicked.connect(self.show_selected)
+        layout.addWidget(show_button)
+        
+        # Результат выбора
+        self.result_label = QLabel("Выберите элемент")
+        layout.addWidget(self.result_label)
+    
+    def add_to_list(self):
+        text = self.input_field.text().strip()
+        if text:
+            self.list_widget.addItem(text)
+            self.input_field.clear()
+    
+    def show_selected(self):
+        if self.list_widget.currentItem():
+            selected = self.list_widget.currentItem().text()
+            self.result_label.setText(f"Выбрано: {selected}")
+
 app = QApplication(sys.argv)
-win = QWidget(); win.setWindowTitle("Базовые виджеты")
-
-label = QLabel("Имя:")
-edit  = QLineEdit()
-listw = QListWidget(); listw.addItems(["Python", "C++", "Go"])
-btn   = QPushButton("Показать выбор")
-
-btn.clicked.connect(lambda: print("Вы выбрали:", listw.currentItem().text()))
-
-# Вернули пример макета, но миниатюрно:
-box = QVBoxLayout(win)
-for w in (label, edit, listw, btn):
-    box.addWidget(w)
-
-win.resize(250, 300)
-win.show()
+window = MainWindow()
+window.show()
 sys.exit(app.exec())
 ```
 
-> Запомните виджеты: `QLabel`, `QLineEdit`, `QListWidget`, `QPushButton` + любой макет (`QVBoxLayout`). Этого набора хватит для первых GUI.
+### 3.3 Комбинированные списки и флажки
 
-## Мини-проект «Заказы» — ultra-лайт
+```python
+import sys
+from PyQt6.QtWidgets import (
+    QApplication, QMainWindow, QWidget, QVBoxLayout,
+    QLabel, QComboBox, QCheckBox
+)
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Выпадающие списки и флажки")
+        
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        
+        layout = QVBoxLayout(central_widget)
+        
+        # Выпадающий список
+        layout.addWidget(QLabel("Выберите ОС:"))
+        self.combo = QComboBox()
+        self.combo.addItems(["Windows", "Linux", "macOS", "Android", "iOS"])
+        self.combo.currentIndexChanged.connect(self.on_combo_changed)
+        layout.addWidget(self.combo)
+        
+        # Флажки
+        layout.addWidget(QLabel("Выберите навыки:"))
+        
+        self.skill_boxes = []
+        for skill in ["Программирование", "Дизайн", "Базы данных", "Сети"]:
+            checkbox = QCheckBox(skill)
+            checkbox.stateChanged.connect(self.on_check_changed)
+            layout.addWidget(checkbox)
+            self.skill_boxes.append(checkbox)
+        
+        # Результат выбора
+        self.result_label = QLabel("Сделайте выбор")
+        layout.addWidget(self.result_label)
+    
+    def on_combo_changed(self):
+        self.update_result()
+    
+    def on_check_changed(self):
+        self.update_result()
+    
+    def update_result(self):
+        os = self.combo.currentText()
+        skills = [box.text() for box in self.skill_boxes if box.isChecked()]
+        
+        result = f"ОС: {os}\nНавыки: {', '.join(skills) if skills else 'не выбраны'}"
+        self.result_label.setText(result)
+
+app = QApplication(sys.argv)
+window = MainWindow()
+window.show()
+sys.exit(app.exec())
+```
+
+### 3.4 Чек-лист важнейших элементов
+
+| Элемент | Класс | Основное использование |
+|---------|-------|------------------------|
+| Кнопка | QPushButton | Для действий пользователя |
+| Метка | QLabel | Для отображения текста |
+| Поле ввода | QLineEdit | Для ввода строк текста |
+| Флажок | QCheckBox | Для опции вкл/выкл |
+| Радио-кнопка | QRadioButton | Для выбора одного варианта из группы |
+| Выпадающий список | QComboBox | Для компактного выбора из списка |
+| Список | QListWidget | Для отображения и выбора из списка |
+| Ползунок | QSlider | Для выбора числовых значений |
+| Таблица | QTableWidget | Для табличных данных |
+| Вкладки | QTabWidget | Для организации интерфейса по вкладкам |
+
+## 4. Практический пример: простой редактор заметок
+
+```python
+import sys
+import json
+from PyQt6.QtWidgets import (
+    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
+    QPushButton, QTextEdit, QListWidget, QInputDialog, QMessageBox
+)
+
+class NotesApp(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Редактор заметок")
+        self.setGeometry(100, 100, 800, 500)
+        
+        # Данные заметок
+        self.notes = {}
+        self.current_note = None
+        
+        # Настройка интерфейса
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        
+        # Главный горизонтальный макет
+        main_layout = QHBoxLayout(central_widget)
+        
+        # Левая панель со списком и кнопками
+        left_panel = QWidget()
+        left_layout = QVBoxLayout(left_panel)
+        
+        # Список заметок
+        self.notes_list = QListWidget()
+        self.notes_list.currentItemChanged.connect(self.on_note_selected)
+        left_layout.addWidget(self.notes_list)
+        
+        # Кнопки действий
+        buttons_layout = QHBoxLayout()
+        
+        self.add_btn = QPushButton("Добавить")
+        self.add_btn.clicked.connect(self.add_note)
+        buttons_layout.addWidget(self.add_btn)
+        
+        self.delete_btn = QPushButton("Удалить")
+        self.delete_btn.clicked.connect(self.delete_note)
+        buttons_layout.addWidget(self.delete_btn)
+        
+        left_layout.addLayout(buttons_layout)
+        
+        # Правая панель для редактирования
+        right_panel = QWidget()
+        right_layout = QVBoxLayout(right_panel)
+        
+        # Текстовое поле для заметки
+        self.note_edit = QTextEdit()
+        right_layout.addWidget(self.note_edit)
+        
+        # Кнопка сохранения
+        self.save_btn = QPushButton("Сохранить")
+        self.save_btn.clicked.connect(self.save_note)
+        right_layout.addWidget(self.save_btn)
+        
+        # Добавляем панели в главный макет
+        main_layout.addWidget(left_panel, 1)  # 1 - относительная доля в макете
+        main_layout.addWidget(right_panel, 2)  # 2 - относительная доля в макете
+        
+        # Загружаем заметки при старте
+        self.load_notes()
+    
+    def load_notes(self):
+        # В реальном приложении здесь была бы загрузка из файла
+        # Для примера используем несколько заготовленных заметок
+        self.notes = {
+            "Приветствие": "Добро пожаловать в редактор заметок!",
+            "О программе": "Это простой редактор заметок на PyQt6.",
+            "Справка": "Используйте кнопки для добавления и удаления заметок."
+        }
+        self.update_notes_list()
+    
+    def update_notes_list(self):
+        self.notes_list.clear()
+        self.notes_list.addItems(self.notes.keys())
+    
+    def on_note_selected(self, current, previous):
+        if current:
+            self.current_note = current.text()
+            self.note_edit.setText(self.notes[self.current_note])
+        else:
+            self.current_note = None
+            self.note_edit.clear()
+    
+    def add_note(self):
+        title, ok = QInputDialog.getText(self, "Новая заметка", "Введите название:")
+        if ok and title:
+            if title in self.notes:
+                QMessageBox.warning(self, "Ошибка", "Заметка с таким названием уже существует!")
+                return
+            
+            self.notes[title] = ""
+            self.update_notes_list()
+            # Выбираем новую заметку
+            items = self.notes_list.findItems(title, Qt.MatchExactly)
+            if items:
+                self.notes_list.setCurrentItem(items[0])
+    
+    def delete_note(self):
+        if self.current_note:
+            reply = QMessageBox.question(
+                self, "Подтверждение", 
+                f"Удалить заметку '{self.current_note}'?",
+                QMessageBox.Yes | QMessageBox.No
+            )
+            
+            if reply == QMessageBox.Yes:
+                del self.notes[self.current_note]
+                self.update_notes_list()
+                self.note_edit.clear()
+    
+    def save_note(self):
+        if self.current_note:
+            self.notes[self.current_note] = self.note_edit.toPlainText()
+            QMessageBox.information(self, "Сохранено", "Заметка сохранена!")
+
+# Запуск приложения
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = NotesApp()
+    window.show()
+    sys.exit(app.exec())
+```
+
+## 5. Шпаргалка для запоминания
+
+### Стандартная структура приложения:
+```
+1. Импорты
+2. Определение главного класса окна (наследуем от QMainWindow)
+3. Настройка интерфейса в __init__
+4. Методы обработки событий
+5. app = QApplication(sys.argv)
+6. window = МойКласс()
+7. window.show()
+8. sys.exit(app.exec())
+```
+
+### Создание интерфейса (сверху вниз):
+```
+1. Создаем центральный виджет 
+2. Создаем главный макет (QVBoxLayout, QHBoxLayout, QGridLayout)
+3. Добавляем в макет виджеты или вложенные макеты
+4. Подключаем сигналы к слотам (методам класса)
+```
+
+### Быстрая памятка по сигналам:
+- Кнопка: `button.clicked.connect(self.метод)`
+- Поле ввода: `line_edit.textChanged.connect(self.метод)`
+- Список: `list_widget.currentItemChanged.connect(self.метод)`
+- Флажок: `check_box.stateChanged.connect(self.метод)`
+
+## 6. Мини-проект «Заказы» — ultra-лайт
 
 ### 1. Самая простая таблица
 
