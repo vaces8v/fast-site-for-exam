@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const navLinks = [
-  { name: "PyQt", href: "/pyqt" },
+  { name: "Grafana", href: "/pyqt" },
   { name: "Компьютерные сети", href: "/" },
 ];
 
